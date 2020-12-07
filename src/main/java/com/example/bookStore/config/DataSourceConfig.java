@@ -5,12 +5,16 @@ import com.baomidou.mybatisplus.extension.spring.MybatisSqlSessionFactoryBean;
 import com.example.bookStore.datasource.DynamicDataSource;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.apache.ibatis.type.JdbcType;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.jdbc.DataSourceBuilder;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
+import org.springframework.jdbc.datasource.DataSourceTransactionManager;
+import org.springframework.transaction.PlatformTransactionManager;
 
 import javax.sql.DataSource;
 import java.util.HashMap;
@@ -23,6 +27,9 @@ import java.util.Map;
  */
 @Configuration
 public class DataSourceConfig {
+    @Autowired
+    private ApplicationContext applicationContext;
+
     @Bean
     @ConfigurationProperties("spring.datasource.master")
     public DataSource masterDataSource() {
@@ -57,5 +64,15 @@ public class DataSourceConfig {
         configuration.setCacheEnabled(false);
         sqlSessionFactory.setConfiguration(configuration);
         return sqlSessionFactory.getObject();
+    }
+
+    /**
+     * 事务管理器
+     *
+     * @return the platform transaction manager
+     */
+    @Bean
+    public PlatformTransactionManager transactionManager() {
+        return new DataSourceTransactionManager((DataSource)applicationContext.getBean("dynamicDataSource"));
     }
 }

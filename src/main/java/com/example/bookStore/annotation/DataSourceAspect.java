@@ -22,7 +22,7 @@ import java.lang.reflect.Method;
 @Slf4j
 public class DataSourceAspect {
 
-    @Around("@annotation(com.example.bookStore.annotation.DataSource)")
+    @Around("@within(com.example.bookStore.annotation.DataSource)")
     public Object around(ProceedingJoinPoint point) throws Throwable {
         MethodSignature signature = (MethodSignature) point.getSignature();
         Method method = signature.getMethod();
@@ -30,7 +30,7 @@ public class DataSourceAspect {
         if (dataSource != null) {
             DynamicDataSourceContextHolder.setDataSourceType(dataSource.value());
         }else {
-            dataSource = signature.getClass().getAnnotation(DataSource.class);
+            dataSource = point.getClass().getAnnotation(DataSource.class);
             if(dataSource != null){
                 DynamicDataSourceContextHolder.setDataSourceType(dataSource.value());
             }

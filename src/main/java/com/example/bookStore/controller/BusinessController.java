@@ -1,5 +1,6 @@
 package com.example.bookStore.controller;
 
+import com.example.bookStore.datasource.DynamicDataSourceContextHolder;
 import com.example.bookStore.entity.Book;
 import com.example.bookStore.entity.PricingRefValue;
 import com.example.bookStore.service.BookService;
@@ -31,6 +32,7 @@ public class BusinessController {
     @ResponseBody
     @Transactional
     public String testMultipleDataSourceTransactional(){
+        DynamicDataSourceContextHolder.setDataSourceType("SLAVE");
         PricingRefValue pricingRefValue = new PricingRefValue();
         pricingRefValue.setRefValueName("固定费用(测试)");
         pricingRefValue.setRefValueId(93000500);
@@ -39,10 +41,12 @@ public class BusinessController {
         Book book = new Book();
         book.setTitle("测试多数据源事务");
         book.setId(100);
+        DynamicDataSourceContextHolder.setDataSourceType("MASTER");
         bookService.updateById(book);
         //System.out.println(100/0);
         pricingRefValue.setRefValueName("产品账期有效天数(测试)");
         pricingRefValue.setRefValueId(93000501);
+        DynamicDataSourceContextHolder.setDataSourceType("SLAVE");
         pricingRefValueService.updateByRefValueId(pricingRefValue);
         return "ok";
     }

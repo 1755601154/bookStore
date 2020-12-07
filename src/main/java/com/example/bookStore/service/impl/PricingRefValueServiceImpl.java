@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
  * @since 2020-11-24 20:14:46
  */
 @Service("pricingRefValueService")
+@DataSource("SLAVE")
 public class PricingRefValueServiceImpl extends ServiceImpl<PricingRefValueMapper, PricingRefValue> implements PricingRefValueService {
 
     @Autowired
@@ -31,7 +32,6 @@ public class PricingRefValueServiceImpl extends ServiceImpl<PricingRefValueMappe
      * @Param [pricingRefValue]
      */
     @Override
-    @DataSource("SLAVE")
     public int updateByRefValueId(PricingRefValue pricingRefValue) {
         LambdaQueryWrapper<PricingRefValue> updateWrapper = new LambdaQueryWrapper();
         return pricingRefValueMapper.update(pricingRefValue,updateWrapper.eq(PricingRefValue::getRefValueId,pricingRefValue.getRefValueId()));
