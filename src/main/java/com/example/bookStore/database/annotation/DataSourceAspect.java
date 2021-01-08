@@ -1,6 +1,6 @@
-package com.example.bookStore.annotation;
+package com.example.bookStore.database.annotation;
 
-import com.example.bookStore.datasource.DynamicDataSourceContextHolder;
+import com.example.bookStore.database.datasource.DynamicDataSourceContextHolder;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;

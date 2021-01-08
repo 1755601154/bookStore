@@ -1,8 +1,8 @@
-package com.example.bookStore.config;
+package com.example.bookStore.database.config;
 
 import com.baomidou.mybatisplus.core.MybatisConfiguration;
 import com.baomidou.mybatisplus.extension.spring.MybatisSqlSessionFactoryBean;
-import com.example.bookStore.datasource.DynamicDataSource;
+import com.example.bookStore.database.datasource.DynamicDataSource;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.apache.ibatis.type.JdbcType;
 import org.springframework.beans.factory.annotation.Autowired;

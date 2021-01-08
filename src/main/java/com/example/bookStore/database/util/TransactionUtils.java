@@ -1,7 +1,9 @@
-package com.example.bookStore.util;
+package com.example.bookStore.database.util;
 
-import com.example.bookStore.datasource.DynamicDataSource;
+import com.example.bookStore.database.datasource.DynamicDataSource;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 import org.springframework.transaction.TransactionDefinition;
 
 import javax.sql.DataSource;
@@ -13,6 +15,8 @@ import java.util.Collection;
  * @description
  * @date 2020-11-28
  */
+@Component
+@Scope("prototype")
 public class TransactionUtils {
 
     @Autowired

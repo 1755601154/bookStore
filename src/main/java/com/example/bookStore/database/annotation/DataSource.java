@@ -1,4 +1,4 @@
-package com.example.bookStore.annotation;
+package com.example.bookStore.database.annotation;
 
 import java.lang.annotation.*;
 

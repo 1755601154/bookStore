@@ -1,4 +1,4 @@
-package com.example.bookStore.datasource;
+package com.example.bookStore.database.datasource;
 
 import lombok.extern.slf4j.Slf4j;
 

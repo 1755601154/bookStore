@@ -1,6 +1,7 @@
 package com.example.bookStore.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.example.bookStore.database.annotation.DataSource;
 import com.example.bookStore.entity.Book;
 
 import java.util.List;
@@ -9,6 +10,7 @@ import java.util.List;
  * @author yuanlei
  * @date 2020-11-18
  */
+@DataSource
 public interface BookService extends IService<Book> {
 
     /**

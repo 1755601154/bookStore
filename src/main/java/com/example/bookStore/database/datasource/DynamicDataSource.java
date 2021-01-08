@@ -1,11 +1,11 @@
-package com.example.bookStore.datasource;
+package com.example.bookStore.database.datasource;
 
+import com.example.bookStore.database.util.ConnectWarp;
 import org.springframework.jdbc.datasource.lookup.AbstractRoutingDataSource;
 
 import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -44,6 +44,26 @@ public class DynamicDataSource extends AbstractRoutingDataSource {
         return (DataSource) targetDataSources.get(key);
     }
 
+    /**
+     * mybatis在使用mapper接口执行sql的时候会从该方法获取connection执行sql
+     * 如果事务是spring或者mybatis在管理，那么直接返回原生的connection
+     * 如果是我们自己控制事务，则返回我们自己实现的ConnetWarp
+     *
+     * @return Connection
+     * @throws SQLException SQLException
+     */
+    @Override
+    public Connection getConnection() throws SQLException {
+        Map<String, Connection> stringConnectionMap = connectionThreadLocal.get();
+        if (stringConnectionMap == null) {
+            // 没开事物 直接返回
+            return determineTargetDataSource().getConnection();
+        } else {
+            // 开了事物 从当前线程中拿 而且拿到的是 包装过的connect 只有手动去提交和关闭连接
+            String currentName = (String) determineCurrentLookupKey();
+            return stringConnectionMap.get(currentName);
+        }
+    }
     /**
      * 开启事物的时候,把连接放入 线程中,后续crud 都会拿对应的连接操作
      *
