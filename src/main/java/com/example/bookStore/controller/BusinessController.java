@@ -2,24 +2,31 @@ package com.example.bookStore.controller;
 
 import com.example.bookStore.datasource.DynamicDataSourceContextHolder;
 import com.example.bookStore.entity.Book;
+import com.example.bookStore.entity.BusClick;
 import com.example.bookStore.entity.PricingRefValue;
 import com.example.bookStore.service.BookService;
 import com.example.bookStore.service.PricingRefValueService;
+import com.example.bookStore.util.ExcelUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author yuanlei
  * @description
  * @date 2020-11-27
  */
-@Controller
+@RestController
 @RequestMapping(value="/business")
 public class BusinessController {
     @Autowired

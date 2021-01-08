@@ -2,27 +2,32 @@ package com.example.bookStore.controller;
 
 import com.example.bookStore.annotation.MethodTiming;
 import com.example.bookStore.entity.Book;
+import com.example.bookStore.entity.BusClick;
 import com.example.bookStore.service.BookService;
+import com.example.bookStore.util.ExcelUtils;
+import org.apache.commons.collections.MapUtils;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 /**
  * @author yuanlei
  * @date 2020-11-03
  */
 @Controller
+@CrossOrigin
 @RequestMapping(value="/book")
 public class BookController {
     @Autowired
@@ -75,5 +80,22 @@ public class BookController {
     @ResponseBody
     public List<Book> queryBookByLimit(int start, int limit){
         return bookService.queryBookByLimit(start,limit);
+    }
+
+    @RequestMapping(value="/queryBookCount",method = RequestMethod.GET)
+    @ResponseBody
+    public int queryBookCount(){
+        return bookService.count();
+    }
+
+    @RequestMapping(value = "/exportExcel", method = RequestMethod.GET)
+    public void exportExcel(HttpServletRequest httpRequest, HttpServletResponse response)  throws IOException {
+        int start = Integer.parseInt(httpRequest.getParameter("start"));
+        int limit = Integer.parseInt(httpRequest.getParameter("limit"));
+        List resultList=bookService.queryBookByLimit(start,limit);
+        long t1 = System.currentTimeMillis();
+        ExcelUtils.writeExcel(response, resultList, Book.class);
+        long t2 = System.currentTimeMillis();
+        System.out.println(String.format("write over! cost:%sms", (t2 - t1)));
     }
 }
