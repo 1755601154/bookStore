@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
+import org.aspectj.lang.annotation.Pointcut;
 import org.aspectj.lang.reflect.MethodSignature;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
@@ -22,7 +23,11 @@ import java.lang.reflect.Method;
 @Slf4j
 public class DataSourceAspect {
 
-    @Around("@within(com.example.bookStore.annotation.DataSource)")
+    @Pointcut("execution(* com.example.bookStore.service.impl.*.*(..))||execution(* com.baomidou.mybatisplus.extension.service.*.*(..)))")
+    public void pointCut() {
+    }
+
+    @Around("pointCut()")
     public Object around(ProceedingJoinPoint point) throws Throwable {
         MethodSignature signature = (MethodSignature) point.getSignature();
         Method method = signature.getMethod();
@@ -30,7 +35,7 @@ public class DataSourceAspect {
         if (dataSource != null) {
             DynamicDataSourceContextHolder.setDataSourceType(dataSource.value());
         }else {
-            dataSource = point.getClass().getAnnotation(DataSource.class);
+            dataSource = point.getTarget().getClass().getAnnotation(DataSource.class);
             if(dataSource != null){
                 DynamicDataSourceContextHolder.setDataSourceType(dataSource.value());
             }
