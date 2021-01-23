@@ -4,7 +4,12 @@ import com.example.bookStore.entity.Book;
 import com.example.bookStore.entity.PricingRefValue;
 import com.example.bookStore.service.BookService;
 import com.example.bookStore.service.PricingRefValueService;
+import lombok.extern.slf4j.Slf4j;
+import org.redisson.Redisson;
+import org.redisson.api.RLock;
+import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -20,12 +25,16 @@ import javax.annotation.Resource;
  */
 @RestController
 @RequestMapping(value="/business")
+@Slf4j
 public class BusinessController {
     @Autowired
     BookService bookService;
-
     @Resource
     private PricingRefValueService pricingRefValueService;
+    @Autowired
+    private RedisTemplate redisTemplate;
+    @Autowired
+    private RedissonClient redissonClient;
 
     @RequestMapping(value="/testMultipleDataSourceTransactional",method = RequestMethod.GET)
     @ResponseBody
@@ -45,5 +54,27 @@ public class BusinessController {
         pricingRefValue.setRefValueId(93000501);
         pricingRefValueService.updateByRefValueId(pricingRefValue);
         return "ok";
+    }
+
+    @RequestMapping(value="/testDistributedRedis",method = RequestMethod.GET)
+    @ResponseBody
+    public String testDistributedRedis(){
+        String lockKey = "lock";
+        RLock redissonLock = redissonClient.getLock(lockKey);
+        try {
+            redissonLock.lock();
+            int num=Integer.parseInt(redisTemplate.opsForValue().get("Books").toString());
+            if(num>0){
+                log.info("产品号："+num+"卖出！");
+                num--;
+                redisTemplate.opsForValue().set("Books",num);
+            }else{
+                log.info("产品不够！");
+            }
+        }finally {
+            redissonLock.unlock();
+            return "ok";
+        }
+
     }
 }
