@@ -43,8 +43,20 @@ public class BookServiceImpl extends ServiceImpl<BookMapper, Book> implements Bo
      * @Param [start, limit]
      */
     @Override
-    @Transactional
     public List<Book> queryBookByLimit(int start, int limit) {
         return bookMapper.queryBookByLimit(start,limit);
+    }
+
+    /**
+     * @param id
+     * @return com.example.bookStore.entity.Book
+     * @Author yuanlei
+     * @Description //查询某行数据，并把这行加排他锁
+     * @Date 10:34 2021/1/27
+     * @Param [id]
+     */
+    @Override
+    public Book getBookByIdForUpdate(Integer id) {
+        return bookMapper.getBookByIdForUpdate(id);
     }
 }

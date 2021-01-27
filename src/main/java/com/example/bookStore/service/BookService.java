@@ -30,4 +30,13 @@ public interface BookService extends IService<Book> {
      * @return java.util.List<com.example.bookStore.entity.Book>
      **/
     List<Book> queryBookByLimit(int start, int limit);
+
+    /**
+     * @Author yuanlei
+     * @Description //查询某行数据，并把这行加排他锁
+     * @Date 10:34 2021/1/27
+     * @Param [id]
+     * @return com.example.bookStore.entity.Book
+     **/
+    Book getBookByIdForUpdate(Integer id);
 }

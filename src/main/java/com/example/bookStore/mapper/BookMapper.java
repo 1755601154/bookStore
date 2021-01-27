@@ -25,4 +25,14 @@ public interface BookMapper extends BaseMapper<Book> {
      **/
     @Select("select * from book limit #{start},#{limit};")
     List<Book> queryBookByLimit(@Param("start") int start, @Param("limit") int limit);
+
+    /**
+     * @Author yuanlei
+     * @Description //查询某行数据，并把这行加排他锁
+     * @Date 10:34 2021/1/27
+     * @Param [id]
+     * @return com.example.bookStore.entity.Book
+     **/
+    @Select("select * from book where id = #{id} for update")
+    Book getBookByIdForUpdate(@Param("id") Integer id);
 }
