@@ -77,4 +77,25 @@ public class BusinessController {
         }
 
     }
+
+    @RequestMapping(value="/testDistributedMysql",method = RequestMethod.GET)
+    @ResponseBody
+    @Transactional
+    public String testDistributedMysql(){
+        synchronized (this){
+            Book book = bookService.getById(7);
+            double num=book.getPrice();
+            String message;
+            if(num>0){
+                message = "产品号："+num+"卖出！";
+                num--;
+                book.setPrice(num);
+                bookService.updateById(book);
+            }else{
+                message = "产品不够！";
+            }
+            log.info(message);
+            return message;
+        }
+    }
 }
