@@ -8,6 +8,7 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.math.BigDecimal;
 import java.net.URLEncoder;
+import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -55,6 +56,8 @@ public class ExcelUtils {
 
     private final static String EXCEL2003 = "xls";
     private final static String EXCEL2007 = "xlsx";
+
+    private final static SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
     public static <T> List<T> readExcel(String path, Class<T> cls, MultipartFile file){
 
@@ -293,11 +296,11 @@ public class ExcelUtils {
                     Cell cell = row1.createCell(aj.getAndIncrement());
                     if (value != null) {
                         if (type == Date.class) {
-                            cell.setCellValue(value.toString());
+                            String dt = simpleDateFormat.format(value);
+                            cell.setCellValue(dt);
                         } else {
                             cell.setCellValue(value.toString());
                         }
-                        cell.setCellValue(value.toString());
                     }
                 });
             });
