@@ -7,6 +7,8 @@ import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.reflect.MethodSignature;
 import org.springframework.stereotype.Component;
 
+import java.lang.reflect.Method;
+
 /**
  * @author yuanlei
  * @date 2020-11-24
@@ -16,18 +18,14 @@ import org.springframework.stereotype.Component;
 @Slf4j
 public class MethodTimingAspect {
     @Around("@annotation(com.example.bookStore.annotation.MethodTiming)")
-    public Object log(ProceedingJoinPoint point) throws Throwable
-    {
-        log.info(MethodSignature.class.cast(point.getSignature()).getMethod().getName()+"方法计时开始!");
-        long start = System.currentTimeMillis();
+    public Object log(ProceedingJoinPoint point) throws Throwable {
+        MethodSignature signature = (MethodSignature) point.getSignature();
+        Method method = signature.getMethod();
+        MethodTiming methodTiming = method.getAnnotation(MethodTiming.class);
+        long startTime = System.currentTimeMillis();
         Object result = point.proceed();
-        log.info(MethodSignature.class.cast(point.getSignature()).getMethod().getName()+"方法计时结束!");
-        log.info("className={}, methodName={}, timeMs={},threadId={}",new Object[]{
-                MethodSignature.class.cast(point.getSignature()).getDeclaringTypeName(),
-                MethodSignature.class.cast(point.getSignature()).getMethod().getName(),
-                System.currentTimeMillis() - start,
-                Thread.currentThread().getId()}
-        );
+        long endTime = System.currentTimeMillis();
+        log.info(String.format(methodTiming.value(), (endTime - startTime)));
         return result;
     }
 }

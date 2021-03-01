@@ -5,7 +5,10 @@ import com.example.bookStore.entity.Book;
 import com.example.bookStore.entity.BusClick;
 import com.example.bookStore.service.BookService;
 import com.example.bookStore.util.ExcelUtils;
+import com.example.bookStore.util.ZipUtils;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.MapUtils;
+import org.apache.poi.ss.usermodel.Workbook;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
@@ -17,6 +20,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.File;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -29,6 +33,7 @@ import java.util.*;
 @Controller
 @CrossOrigin
 @RequestMapping(value="/book")
+@Slf4j
 public class BookController {
     @Autowired
     RabbitTemplate rabbitTemplate;  //使用RabbitTemplate,这提供了接收/发送等等方法
@@ -89,13 +94,28 @@ public class BookController {
     }
 
     @RequestMapping(value = "/exportExcel", method = RequestMethod.GET)
+    @MethodTiming("export Excel over! cost:%sms")
     public void exportExcel(HttpServletRequest httpRequest, HttpServletResponse response)  throws IOException {
         int start = Integer.parseInt(httpRequest.getParameter("start"));
         int limit = Integer.parseInt(httpRequest.getParameter("limit"));
         List resultList=bookService.queryBookByLimit(start,limit);
-        long t1 = System.currentTimeMillis();
-        ExcelUtils.writeExcel(response, resultList, Book.class);
-        long t2 = System.currentTimeMillis();
-        System.out.println(String.format("write over! cost:%sms", (t2 - t1)));
+        Workbook wb = ExcelUtils.writeExcel(resultList, Book.class);
+        //浏览器下载excel文件
+        ExcelUtils.buildExcelDocument("图书清单"+ LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd"))+".xlsx",wb,response);
+    }
+
+    @RequestMapping(value = "/exportExcelZip", method = RequestMethod.GET)
+    @MethodTiming("export ExcelZip over! cost:%sms")
+    public void exportExcelZip(HttpServletRequest httpRequest, HttpServletResponse response)  throws IOException {
+        int start = Integer.parseInt(httpRequest.getParameter("start"));
+        int limit = Integer.parseInt(httpRequest.getParameter("limit"));
+        List resultList=bookService.queryBookByLimit(start,limit);
+        Workbook wb = ExcelUtils.writeExcel(resultList, Book.class);
+        File file = ExcelUtils.buildExcelFile("图书清单"+ LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd"))+".xlsx",wb);
+        File[] files = new File[1];
+        files[0] = file;
+        //浏览器下载excel.zip文件
+        ZipUtils.zipFileByHttp("图书清单"+LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd"))+".zip",files,response);
+        file.delete();
     }
 }

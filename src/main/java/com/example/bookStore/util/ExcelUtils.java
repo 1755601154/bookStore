@@ -235,7 +235,7 @@ public class ExcelUtils {
 
     }
 
-    public static <T> void writeExcel(HttpServletResponse response, List<T> dataList, Class<T> cls){
+    public static <T> Workbook writeExcel(List<T> dataList, Class<T> cls){
         Field[] fields = cls.getDeclaredFields();
         List<Field> fieldList = Arrays.stream(fields)
                 .filter(field -> {
@@ -305,10 +305,8 @@ public class ExcelUtils {
                 });
             });
         }
-        //冻结窗格
-        wb.getSheet("Sheet1").createFreezePane(0, 1, 0, 1);
-        //浏览器下载excel
-        buildExcelDocument("图书清单"+ LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd"))+".xlsx",wb,response);
+        wb.getSheet("Sheet1").createFreezePane(0, 1, 0, 1);//冻结窗格
+        return wb;
         //生成excel文件
 //        buildExcelFile(".\\default.xlsx",wb);
     }
@@ -320,7 +318,7 @@ public class ExcelUtils {
      * @param response
      */
 
-    private static  void  buildExcelDocument(String fileName, Workbook wb,HttpServletResponse response){
+    public static  void  buildExcelDocument(String fileName, Workbook wb,HttpServletResponse response){
         try {
             response.setContentType(MediaType.APPLICATION_OCTET_STREAM_VALUE);
             response.setHeader("Content-Disposition", "attachment;filename="+URLEncoder.encode(fileName, "utf-8"));
@@ -336,8 +334,7 @@ public class ExcelUtils {
      * @param path 生成excel路径
      * @param wb
      */
-    private static  void  buildExcelFile(String path, Workbook wb){
-
+    public static  File  buildExcelFile(String path, Workbook wb){
         File file = new File(path);
         if (file.exists()) {
             file.delete();
@@ -347,5 +344,6 @@ public class ExcelUtils {
         } catch (Exception e) {
             e.printStackTrace();
         }
+        return file;
     }
 }
