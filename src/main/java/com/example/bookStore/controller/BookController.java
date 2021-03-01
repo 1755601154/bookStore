@@ -100,8 +100,9 @@ public class BookController {
         int limit = Integer.parseInt(httpRequest.getParameter("limit"));
         List resultList=bookService.queryBookByLimit(start,limit);
         Workbook wb = ExcelUtils.writeExcel(resultList, Book.class);
+        String uuId = UUID.randomUUID().toString().replaceAll("-","");
         //浏览器下载excel文件
-        ExcelUtils.buildExcelDocument("图书清单"+ LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd"))+".xlsx",wb,response);
+        ExcelUtils.buildExcelDocument("图书清单"+ uuId +".xlsx",wb,response);
     }
 
     @RequestMapping(value = "/exportExcelZip", method = RequestMethod.GET)
@@ -111,7 +112,8 @@ public class BookController {
         int limit = Integer.parseInt(httpRequest.getParameter("limit"));
         List resultList=bookService.queryBookByLimit(start,limit);
         Workbook wb = ExcelUtils.writeExcel(resultList, Book.class);
-        File file = ExcelUtils.buildExcelFile("图书清单"+ LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd"))+".xlsx",wb);
+        String uuId = UUID.randomUUID().toString().replaceAll("-","");
+        File file = ExcelUtils.buildExcelFile("图书清单-"+ uuId +".xlsx",wb);
         File[] files = new File[1];
         files[0] = file;
         //浏览器下载excel.zip文件
