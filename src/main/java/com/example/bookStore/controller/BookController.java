@@ -1,5 +1,6 @@
 package com.example.bookStore.controller;
 
+import com.example.bookStore.annotation.Authority;
 import com.example.bookStore.annotation.MethodTiming;
 import com.example.bookStore.entity.Book;
 import com.example.bookStore.entity.BusClick;
@@ -77,6 +78,7 @@ public class BookController {
     @ResponseBody
     @Cacheable(value = "Books", key = "#id")
     @MethodTiming
+    @Authority(needLogin = true)
     public Book getBookById(int id){
         return bookService.getById(id);
     }
