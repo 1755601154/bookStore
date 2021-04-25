@@ -24,11 +24,10 @@ public class DirectReceiver {
     @Autowired
     BookService bookService;
 
-    private static SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-
     @RabbitHandler
     @SneakyThrows
     public void process(Map testMessage) {
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         log.info("DirectReceiver消费者收到消息  : " + testMessage.toString());
         Book book = new Book();
         book.setTitle(testMessage.get("title").toString());
