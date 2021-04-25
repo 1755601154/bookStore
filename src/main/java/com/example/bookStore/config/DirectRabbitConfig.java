@@ -4,6 +4,9 @@ import org.springframework.amqp.core.Binding;
 import org.springframework.amqp.core.BindingBuilder;
 import org.springframework.amqp.core.DirectExchange;
 import org.springframework.amqp.core.Queue;
+import org.springframework.amqp.rabbit.config.SimpleRabbitListenerContainerFactory;
+import org.springframework.amqp.rabbit.connection.ConnectionFactory;
+import org.springframework.boot.autoconfigure.amqp.SimpleRabbitListenerContainerFactoryConfigurer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -14,6 +17,9 @@ import org.springframework.context.annotation.Configuration;
  */
 @Configuration
 public class DirectRabbitConfig {
+
+    //并发数量
+    public static final int DEFAULT_CONCURRENT = 20;
 
     //队列 起名：TestDirectQueue
     @Bean
@@ -40,13 +46,19 @@ public class DirectRabbitConfig {
         return BindingBuilder.bind(TestDirectQueue()).to(TestDirectExchange()).with("TestDirectRouting");
     }
 
-
-
     @Bean
     DirectExchange lonelyDirectExchange() {
         return new DirectExchange("lonelyDirectExchange");
     }
 
-
+    @Bean("customContainerFactory")
+    public SimpleRabbitListenerContainerFactory containerFactory(SimpleRabbitListenerContainerFactoryConfigurer configurer,
+                                                                 ConnectionFactory connectionFactory) {
+        SimpleRabbitListenerContainerFactory factory = new SimpleRabbitListenerContainerFactory();
+        factory.setConcurrentConsumers(DEFAULT_CONCURRENT);
+        factory.setMaxConcurrentConsumers(DEFAULT_CONCURRENT);
+        configurer.configure(factory, connectionFactory);
+        return factory;
+    }
 
 }

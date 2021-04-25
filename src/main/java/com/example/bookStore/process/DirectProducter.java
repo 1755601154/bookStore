@@ -41,7 +41,7 @@ public class DirectProducter implements DisposableBean,Runnable {
             sendDirectMessage();
             //Thread.sleep(1*1000L);
             count++;
-            if(count>1){
+            if(count>1000000){
                 someCondition=false;
             }
         }
