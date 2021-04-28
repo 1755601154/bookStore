@@ -36,7 +36,6 @@ import java.util.concurrent.ConcurrentHashMap;
 
 @RestController
 @RequestMapping("/user")
-@EnableScheduling
 public class UserController {
     public static Map<String /*token*/, User /*user info*/> tokenMap = new ConcurrentHashMap<>();
 

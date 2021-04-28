@@ -1,6 +1,5 @@
 package com.example.bookStore.process;
 
-import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.DisposableBean;
@@ -12,49 +11,44 @@ import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 /**
  * @author yuanlei
  * @date 2020-10-31
  */
 @Slf4j
-public class DirectProducter implements DisposableBean,Runnable {
+public class DirectProducer implements DisposableBean{
 
     @Autowired
-    RabbitTemplate rabbitTemplate;  //使用RabbitTemplate,这提供了接收/发送等等方法
-    private Thread thread;
-    private volatile boolean someCondition = true;
-    private int count = 1;
+    private RabbitTemplate rabbitTemplate;  //使用RabbitTemplate,这提供了接收/发送等等方法
+    private ExecutorService cachedThreadPool = Executors.newCachedThreadPool();
+    private volatile int count = 0;
+    public static final int DEFAULT_CONCURRENT = 10;//并发数量
 
-    public DirectProducter() {
-        this.thread = new Thread(this);
-        this.thread.start();
-        log.error("线程启动!");
-    }
-
-    @SneakyThrows
-    @Override
-    public void run() {
-        while (someCondition) {
-            //执行任务
-            log.info("第"+count+"次推送消息");
-            sendDirectMessage();
-            //Thread.sleep(1*1000L);
-            count++;
-            if(count>1000000){
-                someCondition=false;
-            }
+    public DirectProducer() {
+        for(int i=0;i<DEFAULT_CONCURRENT;i++) {
+            cachedThreadPool.submit(() -> {
+                count++;
+                while (count <= 100000) {
+                    log.debug("current message count:{}", count);
+                    sendDirectMessage();
+                    count++;
+                }
+            });
         }
-
+        log.info("mq消息推送线程启动!");
     }
 
     public String sendDirectMessage() {
         String messageId = String.valueOf(UUID.randomUUID());
         String createTime = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
         Map<String,Object> map=new HashMap<>();
-        map.put("title","测试书籍"+messageId);
+        map.put("title",messageId);
         map.put("price",10.2);
         map.put("publishDate",createTime);
+        log.debug("put message:{}",map.toString());
         //将消息携带绑定键值：TestDirectRouting 发送到交换机TestDirectExchange
         rabbitTemplate.convertAndSend("TestDirectExchange", "TestDirectRouting", map);
         return "ok";
@@ -62,6 +56,6 @@ public class DirectProducter implements DisposableBean,Runnable {
 
     @Override
     public void destroy() throws Exception {
-        someCondition = false;
+        cachedThreadPool.shutdown();
     }
 }

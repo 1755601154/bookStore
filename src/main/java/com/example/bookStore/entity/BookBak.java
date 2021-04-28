@@ -1,24 +1,19 @@
 package com.example.bookStore.entity;
 
 import java.util.Date;
-
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.extension.activerecord.Model;
-
 import java.io.Serializable;
 
 /**
- * (Book)表实体类
+ * (BookBak)表实体类
  *
  * @author yuanlei
- * @since 2021-04-28 10:48:42
+ * @since 2021-04-28 10:53:21
  */
 @SuppressWarnings("serial")
-public class Book extends Model<Book> {
+public class BookBak extends Model<BookBak> {
     
 
-    @TableId(type = IdType.AUTO)
     private Integer id;
     
 
@@ -29,6 +24,9 @@ public class Book extends Model<Book> {
     
 
     private Date publishDate;
+    
+
+    private String message;
 
 
     public Integer getId() {
@@ -61,6 +59,14 @@ public class Book extends Model<Book> {
 
     public void setPublishDate(Date publishDate) {
         this.publishDate = publishDate;
+    }
+
+    public String getMessage() {
+        return message;
+    }
+
+    public void setMessage(String message) {
+        this.message = message;
     }
 
     /**
