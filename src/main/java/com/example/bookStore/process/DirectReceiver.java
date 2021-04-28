@@ -1,5 +1,6 @@
 package com.example.bookStore.process;
 
+import com.alibaba.fastjson.JSONObject;
 import com.example.bookStore.entity.Book;
 import com.example.bookStore.entity.BookBak;
 import com.example.bookStore.service.BookBakService;
@@ -30,23 +31,23 @@ public class DirectReceiver {
     @Autowired
     BookBakService bookBakService;
 
-    @RabbitHandler
     @SneakyThrows
-    public void process(Book book) {
-        /*SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        log.debug("DirectReceiver receive message  : " + testMessage.toString());
+    public void process(Map testMessage) {
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        log.debug("DirectReceiver receive message  : {}",testMessage.toString());
         Book book = new Book();
         book.setTitle(testMessage.get("title").toString());
         book.setPrice(new Double((testMessage.get("price").toString())));
         book.setPublishDate(dateFormat.parse(testMessage.get("publishDate").toString()));
-        bookService.save(book);*/
-        BookBak bookBak = new BookBak();
-        bookBak.setId(book.getId());
-        bookBak.setPrice(book.getPrice());
-        bookBak.setTitle(book.getTitle());
-        bookBak.setPublishDate(book.getPublishDate());
-        bookBak.setMessage(book.toString());
-        bookBakService.save(bookBak);
+        bookService.save(book);
+
     }
 
+    @RabbitHandler
+    public void saveBookBak(String object) {
+        log.debug("DirectReceiver receive message  : {}",object);
+        BookBak bookBak = JSONObject.parseObject(object,BookBak.class);
+        bookBak.setMessage(object);
+        bookBakService.save(bookBak);
+    }
 }

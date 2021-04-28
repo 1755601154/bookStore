@@ -1,9 +1,11 @@
 package com.example.bookStore.process;
 
+import com.alibaba.fastjson.JSON;
 import com.example.bookStore.annotation.MethodTiming;
 import com.example.bookStore.entity.Book;
 import com.example.bookStore.service.BookService;
 import lombok.extern.slf4j.Slf4j;
+import org.redisson.api.RedissonClient;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.ApplicationArguments;
@@ -17,6 +19,7 @@ import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author yuanlei
@@ -76,7 +79,7 @@ public class LoadData implements ApplicationRunner {
             }
             List<Book> results= bookService.queryBookByLimit(start,limit);
             for(Book book:results){
-                redisTemplate.opsForValue().set("Books::"+book.getId().toString(),book);
+                redisTemplate.opsForValue().set("Books::"+book.getId().toString(),book,10, TimeUnit.SECONDS);
             }
         }
         log.info("加载数据至redis完毕!");
@@ -91,13 +94,12 @@ public class LoadData implements ApplicationRunner {
      **/
     public void loadDtaToRabbitMQ(){
         log.info("开始加载数据进rabbitMQ");
-        int count = bookService.count();
         //分批次查询数据，每次最多900000条数据，避免内存泄漏
         int limit = 900000;
         while (bookService.count()>0){
             List<Book> results= bookService.queryBookByLimit(0,limit);
             for(Book book:results){
-                rabbitTemplate.convertAndSend("TestDirectExchange", "TestDirectRouting", book);
+                rabbitTemplate.convertAndSend("TestDirectExchange", "TestDirectRouting", JSON.toJSON(book).toString());
                 bookService.removeById(book.getId());
             }
         }
