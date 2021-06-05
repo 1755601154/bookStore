@@ -1,6 +1,5 @@
 package com.example.bookStore.database.datasource;
 
-import com.example.bookStore.database.util.ConnectWarp;
 import org.springframework.jdbc.datasource.lookup.AbstractRoutingDataSource;
 
 import javax.sql.DataSource;
@@ -13,7 +12,7 @@ import java.util.Map;
  * @description 动态切换数据
  * @date 2020-11-24
  */
-public class DynamicDataSource extends AbstractRoutingDataSource {
+public class MultipleDataSource extends AbstractRoutingDataSource {
 
     /**
      * 抽象类AbstractRoutingDataSource中的resolvedDataSources存储了最终解析后的数据源
@@ -27,7 +26,7 @@ public class DynamicDataSource extends AbstractRoutingDataSource {
      */
     private ThreadLocal<Map<String, Connection>> connectionThreadLocal = new ThreadLocal<>();
 
-    public DynamicDataSource(DataSource defaultTargetDataSource, Map<Object, Object> targetDataSources) {
+    public MultipleDataSource(DataSource defaultTargetDataSource, Map<Object, Object> targetDataSources) {
         super.setDefaultTargetDataSource(defaultTargetDataSource);
         super.setTargetDataSources(targetDataSources);
         this.targetDataSources=targetDataSources;
@@ -37,7 +36,7 @@ public class DynamicDataSource extends AbstractRoutingDataSource {
 
     @Override
     protected Object determineCurrentLookupKey() {
-        return DynamicDataSourceContextHolder.getDataSourceType();
+        return MultipleDataSourceContextHolder.getDataSourceType();
     }
 
     public DataSource getDataSource(String key) {

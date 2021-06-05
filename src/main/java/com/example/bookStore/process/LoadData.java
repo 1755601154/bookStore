@@ -27,7 +27,6 @@ import java.util.concurrent.TimeUnit;
  * @date 2020-11-20
  */
 @Slf4j
-@Component
 public class LoadData implements ApplicationRunner {
     @Autowired
     private BookService bookService;

@@ -1,6 +1,6 @@
 package com.example.bookStore.database.util;
 
-import com.example.bookStore.database.datasource.DynamicDataSource;
+import com.example.bookStore.database.datasource.MultipleDataSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -20,7 +20,7 @@ import java.util.Collection;
 public class TransactionUtils {
 
     @Autowired
-    private DynamicDataSource multiRouteDataSource;
+    private MultipleDataSource multiRouteDataSource;
 
     /**
      * @param codes           用到的数据源的key

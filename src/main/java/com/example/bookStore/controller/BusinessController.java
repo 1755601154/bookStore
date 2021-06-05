@@ -17,6 +17,8 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author yuanlei
@@ -38,21 +40,25 @@ public class BusinessController {
 
     @RequestMapping(value="/testMultipleDataSourceTransactional",method = RequestMethod.GET)
     @ResponseBody
-    @Transactional
+    //@Transactional
     public String testMultipleDataSourceTransactional(){
-        PricingRefValue pricingRefValue = new PricingRefValue();
+        /*PricingRefValue pricingRefValue = new PricingRefValue();
         pricingRefValue.setRefValueName("固定费用(测试)");
         pricingRefValue.setRefValueId(93000500);
-        pricingRefValueService.updateByRefValueId(pricingRefValue);
+        pricingRefValueService.updateByRefValueId(pricingRefValue);*/
         //System.out.println(100/0);
         Book book = new Book();
         book.setTitle("测试多数据源事务");
         book.setId(100);
+        List<Book> books = new ArrayList<>();
+        books.add(book);
+        long count = books.stream().filter(item->item.getId()>100&&item.getId()<1000).count();
+        bookService.updateById(book);
         bookService.updateById(book);
         //System.out.println(100/0);
-        pricingRefValue.setRefValueName("产品账期有效天数(测试)");
+        /*pricingRefValue.setRefValueName("产品账期有效天数(测试)");
         pricingRefValue.setRefValueId(93000501);
-        pricingRefValueService.updateByRefValueId(pricingRefValue);
+        pricingRefValueService.updateByRefValueId(pricingRefValue);*/
         return "ok";
     }
 

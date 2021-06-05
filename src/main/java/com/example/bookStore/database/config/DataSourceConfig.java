@@ -2,7 +2,7 @@ package com.example.bookStore.database.config;
 
 import com.baomidou.mybatisplus.core.MybatisConfiguration;
 import com.baomidou.mybatisplus.extension.spring.MybatisSqlSessionFactoryBean;
-import com.example.bookStore.database.datasource.DynamicDataSource;
+import com.example.bookStore.database.datasource.MultipleDataSource;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.apache.ibatis.type.JdbcType;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,13 +44,13 @@ public class DataSourceConfig {
         return DataSourceBuilder.create().build();
     }
 
-    @Bean(name = "dynamicDataSource")
+    @Bean(name = "multipleDataSource")
     @Primary
-    public DynamicDataSource dataSource(DataSource masterDataSource, DataSource slaveDataSource) {
+    public MultipleDataSource dataSource(DataSource masterDataSource, DataSource slaveDataSource) {
         Map<Object, Object> targetDataSources = new HashMap<>();
         targetDataSources.put("MASTER", masterDataSource);
         targetDataSources.put("SLAVE", slaveDataSource);
-        return new DynamicDataSource(masterDataSource, targetDataSources);
+        return new MultipleDataSource(masterDataSource, targetDataSources);
     }
 
     @Bean("sqlSessionFactory")
@@ -73,6 +73,6 @@ public class DataSourceConfig {
      */
     @Bean
     public PlatformTransactionManager transactionManager() {
-        return new DataSourceTransactionManager((DataSource)applicationContext.getBean("dynamicDataSource"));
+        return new DataSourceTransactionManager((DataSource)applicationContext.getBean("multipleDataSource"));
     }
 }

@@ -1,6 +1,6 @@
 package com.example.bookStore.database.annotation;
 
-import com.example.bookStore.database.datasource.DynamicDataSourceContextHolder;
+import com.example.bookStore.database.datasource.MultipleDataSourceContextHolder;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
@@ -33,18 +33,18 @@ public class DataSourceAspect {
         Method method = signature.getMethod();
         DataSource dataSource = method.getAnnotation(DataSource.class);
         if (dataSource != null) {
-            DynamicDataSourceContextHolder.setDataSourceType(dataSource.value());
+            MultipleDataSourceContextHolder.setDataSourceType(dataSource.value());
         }else {
             dataSource = point.getTarget().getClass().getAnnotation(DataSource.class);
             if(dataSource != null){
-                DynamicDataSourceContextHolder.setDataSourceType(dataSource.value());
+                MultipleDataSourceContextHolder.setDataSourceType(dataSource.value());
             }
         }
         try {
             return point.proceed();
         } finally {
             // 销毁数据源 在执行方法之后
-            DynamicDataSourceContextHolder.clearDataSourceType();
+            MultipleDataSourceContextHolder.clearDataSourceType();
         }
     }
 }
